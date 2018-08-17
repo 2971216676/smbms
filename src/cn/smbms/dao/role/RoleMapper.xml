@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.smbms.dao.role.RoleMapper">
+	<select id="getRoleList" resultType="Role">
+		select * from smbms_role
+	</select>
+	
+	<insert id="addRole" parameterType="Role">
+		insert into smbms_role (roleCode,roleName,createdBy,creationDate) 
+				values (#{roleCode},#{roleName},#{createdBy},#{creationDate})
+	</insert>
+	
+	<select id="getRoleByRoleCode" resultType="Int">
+		SELECT COUNT(1) FROM smbms_role WHERE roleCode=#{roleCode}
+	</select>
+	
+	<select id="getRoleById" resultType="Role">
+		select * from smbms_role where id=#{id}
+	</select>
+	
+	<update id="upeRole" parameterType="Role">
+		update smbms_role 
+		 <trim prefix="set" suffixOverrides="," suffix="where id = #{id}">
+	 		<if test="roleCode != null">roleCode=#{roleCode},</if>
+			<if test="roleName != null">roleName=#{roleName},</if>
+			<if test="modifyBy != null">modifyBy=#{modifyBy},</if>
+			<if test="modifyDate != null">modifyDate=#{modifyDate},</if>
+		 </trim>
+	</update>
+	
+	<delete id="delRole">
+		delete from smbms_role where id=#{id}
+	</delete>
+	
+	<select id="getUserRoleByUserRoleId" resultType="Int">
+		SELECT COUNT(1) FROM smbms_user WHERE userRole = #{roleId}
+	</select>
+	
+</mapper>

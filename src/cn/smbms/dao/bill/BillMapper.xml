@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.smbms.dao.bill.BillMapper">
+
+
+	<select id="getBillCountByProviderId" resultType="int">
+		select count(1)
+		as billCount from smbms_bill where providerId = #{providerId}
+	</select>
+
+	<resultMap type="Bill" id="billList">
+		<result property="id" column="id" />
+		<result property="billCode" column="billCode" />
+		<result property="productName" column="productName" />
+		<result property="productDesc" column="productDesc" />
+		<result property="totalPrice" column="totalPrice" />
+		<result property="isPayment" column="isPayment" />
+		<result property="creationDate" column="creationDate" />
+		<result property="providerName" column="proName" />
+	</resultMap>
+
+	<select id="getBillList" resultMap="billList">
+		SELECT b.*,p.proName,p.id
+		FROM smbms_bill b,smbms_provider p
+		where
+		b.providerId=p.id
+		<if test="productName !='' and productName != null">
+			AND b.productName LIKE CONCAT ('%',#{productName},'%')
+		</if>
+		<if test="providerId != null">
+			and b.providerId = #{providerId}
+		</if>
+		<if test="isPayment != null and isPayment != ''">
+			AND b.isPayment=#{isPayment}
+		</if>
+		order by creationDate DESC LIMIT #{from},#{pageSize}
+	</select>
+
+
+
+	<select id="getBillCount" resultType="Int">
+		select count(1) as count from smbms_bill b, smbms_provider p where
+		b.providerId = p.id
+		<if test="providerId != null">
+			and providerId = #{providerId}
+		</if>
+		<if test="productName != null and productName != ''">
+			and productName like CONCAT ('%',#{productName},'%')
+		</if>
+		<if test="isPayment != null">
+			and isPayment = #{isPayment}
+		</if>
+	</select>
+
+	<insert id="addBill" parameterType="Bill">
+		insert into smbms_bill
+		(billCode,productName,productUnit,productCount,
+		totalPrice,isPayment,providerId,createdBy,creationDate)
+		values
+		(#{billCode},#{productName},#{productUnit},#{productCount},
+		#{totalPrice},#{isPayment},#{providerId},#{createdBy},#{creationDate})
+	</insert>
+
+	<resultMap type="Bill" id="billById">
+		<result property="id" column="id" />
+		<result property="billCode" column="billCode" />
+		<result property="productName" column="productName" />
+		<result property="productDesc" column="productDesc" />
+		<result property="totalPrice" column="totalPrice" />
+		<result property="isPayment" column="isPayment" />
+		<result property="creationDate" column="creationDate" />
+		<result property="providerName" column="proName" />
+	</resultMap>
+
+	<select id="getBillByid" resultMap="billById">
+		SELECT b.*,p.* FROM
+		smbms_bill b,smbms_provider p
+		WHERE p.id=b.providerId AND b.id=#{id}
+	</select>
+
+	<update id="updBill" parameterType="Bill">
+		update smbms_bill
+		<trim prefix="set" suffixOverrides="," suffix="where id = #{id}">
+			<if test="billCode !=null">billCode=#{billCode},</if>
+			<if test="productName !=null">productName=#{productName},</if>
+			<if test="productUnit !=null">productUnit=#{productUnit},</if>
+			<if test="productCount !=null">productCount=#{productCount},</if>
+			<if test="totalPrice !=null">totalPrice=#{totalPrice},</if>
+			<if test="isPayment !=null">isPayment=#{isPayment},</if>
+			<if test="providerId !=null">providerId=#{providerId},</if>
+		</trim>
+	</update>
+	
+	<delete id="delBill">
+		delete from smbms_bill where id=#{id}
+	</delete>
+
+
+</mapper>
